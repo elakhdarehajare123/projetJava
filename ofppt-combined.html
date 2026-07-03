@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OFPPT M105 – Mini-Projet JavaScript</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<style>
+/* ============================================================
+   VARIABLES & RESET
+   ============================================================ */
+:root {
+  --accent: #7c3aed;
+  --accent-dark: #5b21b6;
+  --accent-light: #a78bfa;
+  --accent-glow: rgba(124, 58, 237, 0.35);
+  --danger: #e11d48;
+  --success: #059669;
+  --warning: #d97706;
+  --bg-page: #f5f3ff;
+  --bg-card: #ffffff;
+  --bg-header: #1e1b4b;
+  --bg-nav: #2e1065;
+  --bg-sidebar: #faf5ff;
+  --text-main: #1e1b4b;
+  --text-muted: #6b7280;
+  --text-light: #ffffff;
+  --border: #ede9fe;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(109,40,217,.10), 0 1px 2px rgba(109,40,217,.07);
+  --shadow-lg: 0 10px 30px rgba(109,40,217,.18);
+  --transition: 0.22s ease;
+  --sidebar-w: 220px;
+  --header-h: 64px;
+  --nav-h: 48px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+ul { list-style: none; }
+img { display: block; }
+
+.hidden { display: none !important; }
+
+/* ============================================================
+   AUTH PAGES (Login / CreateAccount)
+   ============================================================ */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 45%, #7c3aed 100%);
+  padding: 24px;
+  animation: bgShift 8s ease infinite alternate;
+}
+
+@keyframes bgShift {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.auth-card {
+  background: rgba(255,255,255,0.97);
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(109,40,217,.3), 0 0 0 1px rgba(124,58,237,.1);
+  animation: cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(32px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-card.wide { max-width: 680px; }
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo-icon { font-size: 2.5rem; }
+
+.auth-logo h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 8px;
+}
+
+.auth-logo p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  color: var(--text-main);
+  background: #fff;
+  transition: border-color var(--transition);
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+}
+
+.form-group .hint {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin-top: 4px;
+  display: block;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.form-grid .form-group.full {
+  grid-column: 1 / -1;
+}
+
+.remember-row {
+  margin-bottom: 16px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.07em;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover:not(:disabled)::after { opacity: 1; }
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-dark) 0%, #3b0764 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--accent-glow);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.btn-primary:disabled {
+  background: #c4b5fd;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.error-list {
+  margin-top: 12px;
+  color: var(--danger);
+  font-size: 0.88rem;
+  list-style: disc;
+  padding-left: 20px;
+}
+
+.error-list li { margin-bottom: 4px; }
+
+.auth-link {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+#page-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* HEADER */
+#main-header {
+  height: var(--header-h);
+  background: var(--bg-header);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.header-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #475569;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #cbd5e1;
+  font-size: 0.92rem;
+  margin-left: auto;
+}
+
+#header-name { font-weight: 600; }
+
+.btn-logout {
+  background: rgba(225, 29, 72, 0.15);
+  color: #fda4af;
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.btn-logout:hover {
+  background: rgba(225, 29, 72, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(225,29,72,.2);
+}
+
+/* NAV BAR */
+#nav-bar {
+  background: var(--bg-nav);
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  overflow-x: auto;
+}
+
+#nav-list {
+  display: flex;
+  gap: 4px;
+}
+
+#nav-list li a {
+  color: #94a3b8;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: color var(--transition), background var(--transition);
+  display: block;
+  white-space: nowrap;
+}
+
+#nav-list li a:hover,
+#nav-list li a.active {
+  color: #fff;
+  background: rgba(167,139,250,0.2);
+  text-decoration: none;
+  box-shadow: inset 0 0 0 1px rgba(167,139,250,0.3);
+}
+
+/* BODY */
+.layout-body {
+  display: flex;
+  flex: 1;
+}
+
+/* SIDEBAR */
+#sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+  min-height: 100%;
+}
+
+#sidebar-list li a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color var(--transition), background var(--transition);
+  border-left: 3px solid transparent;
+}
+
+#sidebar-list li a:hover,
+#sidebar-list li a.active {
+  color: var(--accent);
+  background: #f3e8ff;
+  border-left-color: var(--accent);
+  text-decoration: none;
+}
+
+/* CONTENT */
+#content-section {
+  flex: 1;
+  padding: 28px;
+  overflow-y: auto;
+}
+
+/* ============================================================
+   CONTENT CARDS & COMPONENTS
+   ============================================================ */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+/* PROFILE */
+.profile-header {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.profile-photo {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--border);
+}
+
+.profile-info h2 { font-size: 1.4rem; font-weight: 700; }
+.profile-info p { color: var(--text-muted); font-size: 0.9rem; }
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.profile-field {
+  background: var(--bg-page);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.profile-field .field-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.profile-field .field-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+/* TABLE */
+.table-wrapper { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+thead { background: #f1f5f9; }
+
+th {
+  padding: 11px 14px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border);
+}
+
+td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8fafc; }
+
+td img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.15);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn:hover::before { opacity: 1; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.15); }
+.btn:active { transform: translateY(0) scale(0.97); box-shadow: none; }
+.btn-sm { padding: 5px 11px; font-size: 0.78rem; }
+
+.btn-accent { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: #fff; box-shadow: 0 3px 10px var(--accent-glow); }
+.btn-danger { background: linear-gradient(135deg, #e11d48, #9f1239); color: #fff; box-shadow: 0 3px 10px rgba(225,29,72,.25); }
+.btn-success { background: linear-gradient(135deg, #059669, #065f46); color: #fff; box-shadow: 0 3px 10px rgba(5,150,105,.25); }
+.btn-warning { background: linear-gradient(135deg, #d97706, #92400e); color: #fff; box-shadow: 0 3px 10px rgba(217,119,6,.25); }
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text-muted);
+}
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 4px 12px var(--accent-glow); }
+
+/* BADGE */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.badge-warning { background: #fef3c7; color: #92400e; }
+.badge-success { background: #dcfce7; color: #14532d; }
+.badge-danger  { background: #fee2e2; color: #7f1d1d; }
+.badge-info    { background: #dbeafe; color: #1e3a8a; }
+
+/* FORM INLINE */
+.inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 400px;
+}
+
+.inline-form select,
+.inline-form input,
+.inline-form textarea {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.inline-form select:focus,
+.inline-form input:focus,
+.inline-form textarea:focus {
+  border-color: var(--accent);
+}
+
+/* ALERT */
+.alert {
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.alert-info    { background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; }
+.alert-success { background: #f0fdf4; color: #14532d; border-left: 4px solid #22c55e; }
+.alert-danger  { background: #fef2f2; color: #7f1d1d; border-left: 4px solid #ef4444; }
+.alert-warning { background: #fffbeb; color: #78350f; border-left: 4px solid #f59e0b; }
+
+/* ACCUEIL */
+.welcome-hero {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.welcome-hero .big-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto 20px;
+  border: 4px solid var(--border);
+}
+
+.welcome-hero h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.welcome-hero p {
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-size: 1rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.stat-box {
+  background: var(--bg-page);
+  border-radius: 12px;
+  padding: 20px 28px;
+  text-align: center;
+  min-width: 130px;
+}
+
+.stat-box .stat-num {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.stat-box .stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* COULEUR */
+.color-preview {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  border: 3px solid var(--border);
+  margin-bottom: 16px;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+/* Page content entrance */
+#content-section > * {
+  animation: fadeUp 0.35s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Stagger children of content */
+#content-section > *:nth-child(2) { animation-delay: 0.05s; }
+#content-section > *:nth-child(3) { animation-delay: 0.10s; }
+#content-section > *:nth-child(4) { animation-delay: 0.15s; }
+
+/* Card hover lift */
+.card {
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.card:hover {
+  box-shadow: 0 6px 24px rgba(109,40,217,.12);
+  transform: translateY(-2px);
+}
+
+/* Input focus glow */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Ripple effect on buttons */
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+.btn-ripple {
+  position: absolute;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,0.4);
+  transform: scale(0);
+  animation: ripple 0.55s linear;
+  pointer-events: none;
+}
+
+/* Header logo pulse */
+.header-logo .logo-icon {
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.12); }
+}
+
+/* Toast slide-in */
+@keyframes slideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* Spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* TOAST */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: var(--bg-header);
+  color: #fff;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideIn 0.3s ease;
+  min-width: 260px;
+}
+
+.toast.success { background: var(--success); }
+.toast.error   { background: var(--danger); }
+.toast.warning { background: var(--warning); }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 24px;
+}
+
+.modal-box {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 28px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* DEMANDES */
+.demande-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.tab-btn:hover:not(.active) {
+  border-color: var(--accent-light);
+  color: var(--accent);
+}
+
+/* FOOTER */
+#main-footer {
+  background: var(--bg-header);
+  color: #94a3b8;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-address {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
+.footer-social {
+  display: flex;
+  gap: 12px;
+}
+
+.footer-social a {
+  color: #64748b;
+  font-size: 1.1rem;
+  transition: color var(--transition);
+}
+
+.footer-social a:hover { color: #fff; text-decoration: none; }
+
+.footer-copy {
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  .layout-body { flex-direction: column; }
+
+  #sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 8px 0;
+  }
+
+  #sidebar-list { display: flex; overflow-x: auto; }
+  #sidebar-list li a { border-left: none; border-bottom: 3px solid transparent; padding: 8px 14px; white-space: nowrap; }
+  #sidebar-list li a.active { border-bottom-color: var(--accent); background: transparent; }
+
+  .form-grid { grid-template-columns: 1fr; }
+  .profile-grid { grid-template-columns: 1fr; }
+
+  #main-footer {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stat-row { gap: 12px; }
+}
+
+@media (max-width: 480px) {
+  .auth-card { padding: 24px 16px; }
+  #content-section { padding: 16px; }
+  .header-user span { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- ========== PAGE LOGIN ========== -->
+    <div id="page-login" class="auth-page">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <span class="logo-icon">🎓</span>
+          <h1>OFPPT</h1>
+          <p>M105 – Mini-Projet JavaScript</p>
+        </div>
+        <div class="form-group">
+          <label>Nom d'utilisateur</label>
+          <input type="text" id="login-username" placeholder="Entrez votre pseudo" autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label>Mot de passe</label>
+          <input type="password" id="login-password" placeholder="Entrez votre mot de passe" autocomplete="current-password" />
+        </div>
+        <div class="remember-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember-me" />
+            <span>Se Rappeler de moi</span>
+          </label>
+        </div>
+        <button id="btn-login" class="btn-primary">LOGIN</button>
+        <ul id="login-errors" class="error-list"></ul>
+        <p class="auth-link">Pas encore inscrit ? <a href="#" id="go-create">Créer un compte</a></p>
+      </div>
+    </div>
+
+    <!-- ========== PAGE CREATEACCOUNT ========== -->
+    <div id="page-create" class="auth-page hidden">
+      <div class="auth-card wide">
+        <div class="auth-logo">
+          <span class="logo-icon">🎓</span>
+          <h1>Créer un compte</h1>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nom</label>
+            <input type="text" id="ca-nom" placeholder="Nom de famille" />
+          </div>
+          <div class="form-group">
+            <label>Prénom</label>
+            <input type="text" id="ca-prenom" placeholder="Prénom" />
+          </div>
+          <div class="form-group">
+            <label>Âge</label>
+            <input type="number" id="ca-age" placeholder="Âge" min="1" />
+          </div>
+          <div class="form-group">
+            <label>Pseudo</label>
+            <input type="text" id="ca-pseudo" placeholder="Nom d'utilisateur" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="ca-email" placeholder="exemple@mail.com" />
+          </div>
+          <div class="form-group">
+            <label>Pays</label>
+            <input type="text" id="ca-pays" placeholder="Pays" />
+          </div>
+          <div class="form-group">
+            <label>Devise</label>
+            <input type="text" id="ca-devise" placeholder="Ex: MAD, EUR, USD" />
+          </div>
+          <div class="form-group">
+            <label>Couleur préférée</label>
+            <select id="ca-couleur">
+              <option value="maroon">Maroon</option>
+              <option value="navy">Navy</option>
+              <option value="teal">Teal</option>
+              <option value="darkslategray">Gris ardoise</option>
+              <option value="indigo">Indigo</option>
+              <option value="darkgreen">Vert foncé</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>URL Avatar</label>
+            <input type="url" id="ca-avatar" placeholder="https://..." />
+          </div>
+          <div class="form-group full">
+            <label>URL Photo</label>
+            <input type="url" id="ca-photo" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label>Admin</label>
+            <select id="ca-admin">
+              <option value="false">Non</option>
+              <option value="true">Oui</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Mot de passe</label>
+            <input type="password" id="ca-password" placeholder="Mot de passe" />
+            <small class="hint">8 car. min, maj, min, chiffre, spécial</small>
+          </div>
+          <div class="form-group">
+            <label>Confirmer le mot de passe</label>
+            <input type="password" id="ca-password2" placeholder="Confirmer" />
+          </div>
+        </div>
+        <button id="btn-create" class="btn-primary">Créer le compte</button>
+        <ul id="create-errors" class="error-list"></ul>
+        <p class="auth-link"><a href="#" id="go-login">← Retour à la connexion</a></p>
+      </div>
+    </div>
+
+    <!-- ========== LAYOUT PRINCIPAL ========== -->
+    <div id="page-layout" class="hidden">
+
+      <!-- HEADER -->
+      <header id="main-header">
+        <div class="header-logo">
+          <span class="logo-icon">🎓</span>
+          <span class="logo-text">OFPPT</span>
+        </div>
+        <div class="header-user">
+          <img id="header-avatar" src="" alt="avatar" class="header-avatar" />
+          <span id="header-name"></span>
+        </div>
+        <button id="btn-logout" class="btn-logout">
+          <i class="fas fa-sign-out-alt"></i> Se Déconnecter
+        </button>
+      </header>
+
+      <!-- NAVIGATION BAR (horizontale) -->
+      <nav id="nav-bar">
+        <ul id="nav-list"></ul>
+      </nav>
+
+      <!-- BODY : Index + Content -->
+      <div class="layout-body">
+        <aside id="sidebar">
+          <ul id="sidebar-list"></ul>
+        </aside>
+        <main id="content-section">
+          <!-- Le contenu des pages est injecté ici -->
+        </main>
+      </div>
+
+      <!-- FOOTER -->
+      <footer id="main-footer">
+        <div class="footer-address">
+          <i class="fas fa-map-marker-alt"></i>
+          Hay Salam, Rabat – ISTA Hay Salam
+        </div>
+        <div class="footer-social">
+          <a href="https://facebook.com" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://instagram.com" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="https://twitter.com" target="_blank" title="Twitter"><i class="fab fa-x-twitter"></i></a>
+          <a href="https://linkedin.com" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://youtube.com" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+        <div class="footer-copy">© 2024 OFPPT M105 – Khalid MZIBRA</div>
+      </footer>
+
+    </div>
+
+  </div>
+
+  
+<script>
+const API = 'https://670ed5b73e7151861655eaa3.mockapi.io/Stagiaire';
+const API_DEMANDES = 'https://670ed5b73e7151861655eaa3.mockapi.io/Demandes';
+
+let loginAttempts = 0;
+let currentUser = null;
+
+const COLORS = [
+  { value: 'maroon',       label: 'Maroon'       },
+  { value: 'navy',         label: 'Navy'          },
+  { value: 'teal',         label: 'Teal'          },
+  { value: 'darkslategray',label: 'Gris ardoise'  },
+  { value: 'indigo',       label: 'Indigo'        },
+  { value: 'darkgreen',    label: 'Vert foncé'    },
+  { value: 'darkred',      label: 'Rouge foncé'   },
+  { value: 'steelblue',    label: 'Bleu acier'    },
+  { value: 'saddlebrown',  label: 'Marron selle'  },
+  { value: 'darkolivegreen',label:'Olive foncé'   },
+];
+
+const MENU_ADMIN = [
+  { page: 'accueil',           label: 'Accueil',            icon: 'fa-home'         },
+  { page: 'profil',            label: 'Mon Profil',         icon: 'fa-user'         },
+  { page: 'couleur',           label: 'Modifier Couleur',   icon: 'fa-palette'      },
+  { page: 'liste-utilisateurs',label: 'Liste Utilisateurs', icon: 'fa-users'        },
+  { page: 'ajouter-utilisateur',label:'Ajouter Utilisateur',icon: 'fa-user-plus'    },
+  { page: 'demandes',          label: 'Demandes',           icon: 'fa-inbox'        },
+];
+
+const MENU_VISITEUR = [
+  { page: 'accueil',  label: 'Accueil',          icon: 'fa-home'    },
+  { page: 'profil',   label: 'Mon Profil',       icon: 'fa-user'    },
+  { page: 'couleur',  label: 'Modifier Couleur', icon: 'fa-palette' },
+  { page: 'demandes', label: 'Mes Demandes',     icon: 'fa-inbox'   },
+];
+
+function $(id) { return document.getElementById(id); }
+
+function toast(msg, type = 'info') {
+  let container = $('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+  t.innerHTML = `<span>${icons[type] || 'ℹ'}</span><span>${msg}</span>`;
+  container.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function showPage(id) {
+  ['page-login', 'page-create', 'page-layout'].forEach(p => {
+    const el = $(p);
+    if (el) el.classList.add('hidden');
+  });
+  const target = $(id);
+  if (target) target.classList.remove('hidden');
+}
+
+function getUser() {
+  const raw = sessionStorage.getItem('user');
+  return raw ? JSON.parse(raw) : null;
+}
+
+function saveUser(u) {
+  sessionStorage.setItem('user', JSON.stringify(u));
+  currentUser = u;
+}
+
+function applyBgColor() {
+  const u = getUser();
+  if (u && u.couleur) {
+    document.body.style.setProperty('--bg-page', u.couleur + '1a');
+    document.querySelectorAll('#sidebar, #main-footer').forEach(el => {
+      if (el) el.dataset.colorized = '1';
+    });
+  }
+}
+
+function buildMenu() {
+  const u = getUser();
+  if (!u) return;
+  const menu = u.admin === true || u.admin === 'true' ? MENU_ADMIN : MENU_VISITEUR;
+
+  const navList    = $('nav-list');
+  const sideList   = $('sidebar-list');
+  navList.innerHTML = '';
+  sideList.innerHTML = '';
+
+  menu.forEach(item => {
+    const liNav = document.createElement('li');
+    liNav.innerHTML = `<a href="#" data-page="${item.page}"><i class="fas ${item.icon}"></i> ${item.label}</a>`;
+    navList.appendChild(liNav);
+
+    const liSide = document.createElement('li');
+    liSide.innerHTML = `<a href="#" data-page="${item.page}"><i class="fas ${item.icon}"></i> ${item.label}</a>`;
+    sideList.appendChild(liSide);
+  });
+
+  document.querySelectorAll('[data-page]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const page = a.dataset.page;
+      navigate(page);
+    });
+  });
+}
+
+function setActiveMenu(page) {
+  document.querySelectorAll('[data-page]').forEach(a => {
+    a.classList.toggle('active', a.dataset.page === page);
+  });
+}
+
+function navigate(page, params = {}) {
+  setActiveMenu(page);
+  const content = $('content-section');
+  content.innerHTML = '';
+
+  switch (page) {
+    case 'accueil':            renderAccueil(content); break;
+    case 'profil':             renderProfil(content); break;
+    case 'couleur':            renderCouleur(content); break;
+    case 'liste-utilisateurs': renderListeUtilisateurs(content); break;
+    case 'ajouter-utilisateur':renderAjouterUtilisateur(content); break;
+    case 'demandes':           renderDemandes(content); break;
+    case 'detail-utilisateur': renderDetailUtilisateur(content, params.id); break;
+    case 'modifier-utilisateur': renderModifierUtilisateur(content, params.id); break;
+    default:                   content.innerHTML = '<p>Page introuvable.</p>';
+  }
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+function initLogin() {
+  const saved = localStorage.getItem('remember');
+  if (saved) {
+    const { username, password } = JSON.parse(saved);
+    $('login-username').value = username || '';
+    $('login-password').value = password || '';
+    $('remember-me').checked = true;
+  }
+
+  $('btn-login').addEventListener('click', handleLogin);
+  $('go-create').addEventListener('click', e => { e.preventDefault(); showPage('page-create'); });
+}
+
+async function handleLogin() {
+  const username = $('login-username').value.trim();
+  const password = $('login-password').value.trim();
+  const errList  = $('login-errors');
+  errList.innerHTML = '';
+
+  const errors = [];
+  if (!username) errors.push('Le nom d\'utilisateur est obligatoire.');
+  if (!password) errors.push('Le mot de passe est obligatoire.');
+  if (errors.length) { renderErrors(errList, errors); return; }
+
+  $('btn-login').disabled = true;
+  $('btn-login').textContent = 'Connexion...';
+
+  try {
+    const res  = await fetch(API);
+    const data = await res.json();
+    const user = data.find(u => (u.pseudo === username || u.email === username) && u.MotDePasse === password);
+
+    if (user) {
+      if ($('remember-me').checked) {
+        localStorage.setItem('remember', JSON.stringify({ username, password }));
+      } else {
+        localStorage.removeItem('remember');
+      }
+      loginAttempts = 0;
+      saveUser(user);
+      initLayout();
+      showPage('page-layout');
+    } else {
+      loginAttempts++;
+      if (loginAttempts >= 3) {
+        $('btn-login').disabled = true;
+        $('btn-login').textContent = 'Désactivé';
+        renderErrors(errList, ['Trop de tentatives. Bouton désactivé.']);
+      } else {
+        $('btn-login').disabled = false;
+        $('btn-login').textContent = 'LOGIN';
+        renderErrors(errList, [`Identifiants incorrects. Tentative ${loginAttempts}/3`]);
+      }
+    }
+  } catch {
+    $('btn-login').disabled = loginAttempts >= 3;
+    $('btn-login').textContent = loginAttempts >= 3 ? 'Désactivé' : 'LOGIN';
+    renderErrors(errList, ['Erreur de connexion. Vérifiez votre réseau.']);
+  }
+}
+
+function renderErrors(ul, errors) {
+  ul.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+}
+
+/* ============================================================
+   CREATE ACCOUNT
+   ============================================================ */
+function initCreate() {
+  $('go-login').addEventListener('click', e => { e.preventDefault(); showPage('page-login'); });
+  $('btn-create').addEventListener('click', handleCreate);
+}
+
+async function handleCreate() {
+  const fields = {
+    nom:        $('ca-nom').value.trim(),
+    prenom:     $('ca-prenom').value.trim(),
+    age:        $('ca-age').value.trim(),
+    pseudo:     $('ca-pseudo').value.trim(),
+    email:      $('ca-email').value.trim(),
+    Pays:       $('ca-pays').value.trim(),
+    Devise:     $('ca-devise').value.trim(),
+    couleur:    $('ca-couleur').value,
+    avatar:     $('ca-avatar').value.trim(),
+    photo:      $('ca-photo').value.trim(),
+    admin:      $('ca-admin').value === 'true',
+    MotDePasse: $('ca-password').value,
+  };
+  const confirm = $('ca-password2').value;
+  const errList = $('create-errors');
+  errList.innerHTML = '';
+
+  const errors = [];
+  Object.entries(fields).forEach(([k, v]) => {
+    if (v === '' || v === null || v === undefined) errors.push(`Le champ "${k}" est obligatoire.`);
+  });
+
+  const pwReg = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  if (fields.MotDePasse && !pwReg.test(fields.MotDePasse)) {
+    errors.push('Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.');
+  }
+  if (fields.MotDePasse !== confirm) errors.push('Les mots de passe ne correspondent pas.');
+
+  if (errors.length) { renderErrors(errList, errors); return; }
+
+  $('btn-create').disabled = true;
+  $('btn-create').textContent = 'Création...';
+
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields),
+    });
+    if (res.ok) {
+      toast('Compte créé ! Vous pouvez vous connecter.', 'success');
+      showPage('page-login');
+    } else {
+      throw new Error();
+    }
+  } catch {
+    renderErrors(errList, ['Erreur lors de la création. Réessayez.']);
+  } finally {
+    $('btn-create').disabled = false;
+    $('btn-create').textContent = 'Créer le compte';
+  }
+}
+
+/* ============================================================
+   LAYOUT INIT
+   ============================================================ */
+function initLayout() {
+  const u = getUser();
+  if (!u) return;
+
+  $('header-name').textContent = `${u.prenom} ${u.nom}`;
+  const av = $('header-avatar');
+  av.src = u.avatar || '';
+  av.onerror = () => { av.style.display = 'none'; };
+
+  applyBgColor();
+  buildMenu();
+
+  $('btn-logout').addEventListener('click', () => {
+    sessionStorage.clear();
+    currentUser = null;
+    document.body.style.removeProperty('--bg-page');
+    loginAttempts = 0;
+    $('btn-login').disabled = false;
+    $('btn-login').textContent = 'LOGIN';
+    $('login-errors').innerHTML = '';
+    showPage('page-login');
+  });
+
+  navigate('accueil');
+}
+
+/* ============================================================
+   PAGE: ACCUEIL
+   ============================================================ */
+function renderAccueil(container) {
+  const u = getUser();
+  container.innerHTML = `
+    <div class="card">
+      <div class="welcome-hero">
+        <img src="${u.photo || u.avatar || ''}" class="big-avatar" alt="photo" onerror="this.src=''">
+        <h2>Bienvenue, ${u.prenom} ${u.nom} !</h2>
+        <p>${u.admin === true || u.admin === 'true' ? '👑 Administrateur' : '👤 Visiteur'} · ${u.email}</p>
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="stat-num">${u.Pays || '—'}</div>
+            <div class="stat-label">Pays</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">${u.Devise || '—'}</div>
+            <div class="stat-label">Devise</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">${u.age || '—'}</div>
+            <div class="stat-label">Âge</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   PAGE: PROFIL
+   ============================================================ */
+function renderProfil(container) {
+  const u = getUser();
+  const isAdmin = u.admin === true || u.admin === 'true';
+  const fields = [
+    { label: 'Pseudo',   value: u.pseudo     },
+    { label: 'Email',    value: u.email      },
+    { label: 'Pays',     value: u.Pays       },
+    { label: 'Devise',   value: u.Devise     },
+    { label: 'Couleur',  value: u.couleur    },
+    { label: 'Âge',      value: u.age        },
+    { label: 'Rôle',     value: isAdmin ? 'Administrateur' : 'Visiteur' },
+    { label: 'ID',       value: u.id         },
+    { label: 'Avatar',   value: u.avatar     },
+    { label: 'Photo',    value: u.photo      },
+  ];
+
+  container.innerHTML = `
+    <h2 class="page-title">Mon Profil</h2>
+    <div class="card">
+      <div class="profile-header">
+        <img src="${u.avatar || ''}" class="profile-photo" alt="avatar" onerror="this.style.display='none'">
+        <div class="profile-info">
+          <h2>${u.prenom} ${u.nom}</h2>
+          <p>${isAdmin ? '👑 Administrateur' : '👤 Visiteur'}</p>
+        </div>
+      </div>
+      <div class="profile-grid">
+        ${fields.map(f => `
+          <div class="profile-field">
+            <div class="field-label">${f.label}</div>
+            <div class="field-value">${f.value || '—'}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   PAGE: MODIFIER COULEUR
+   ============================================================ */
+function renderCouleur(container) {
+  const u = getUser();
+  const isAdmin = u.admin === true || u.admin === 'true';
+  const age = parseInt(u.age, 10);
+
+  if (!isAdmin && age < 15) {
+    container.innerHTML = `
+      <h2 class="page-title">Modifier la Couleur</h2>
+      <div class="card">
+        <div class="alert alert-warning">
+          <i class="fas fa-lock"></i>
+          Vous devez avoir au moins 15 ans pour modifier votre couleur.
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const opts = COLORS.map(c =>
+    `<option value="${c.value}" ${u.couleur === c.value ? 'selected' : ''}>${c.label}</option>`
+  ).join('');
+
+  container.innerHTML = `
+    <h2 class="page-title">Modifier la Couleur</h2>
+    <div class="card">
+      <p style="color:var(--text-muted);margin-bottom:16px;">Couleur actuelle :</p>
+      <div class="color-preview" id="color-preview" style="background:${u.couleur}"></div>
+      <div class="inline-form">
+        <select id="select-couleur">${opts}</select>
+        <button class="btn btn-accent" id="btn-save-couleur">
+          <i class="fas fa-save"></i> Valider
+        </button>
+      </div>
+    </div>
+  `;
+
+  $('select-couleur').addEventListener('change', () => {
+    $('color-preview').style.background = $('select-couleur').value;
+  });
+
+  $('btn-save-couleur').addEventListener('click', async () => {
+    const newColor = $('select-couleur').value;
+    $('btn-save-couleur').disabled = true;
+    $('btn-save-couleur').textContent = 'Sauvegarde...';
+    try {
+      await fetch(`${API}/${u.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...u, couleur: newColor }),
+      });
+      u.couleur = newColor;
+      saveUser(u);
+      applyBgColor();
+      toast('Couleur mise à jour !', 'success');
+    } catch {
+      toast('Erreur lors de la mise à jour.', 'error');
+    } finally {
+      $('btn-save-couleur').disabled = false;
+      $('btn-save-couleur').innerHTML = '<i class="fas fa-save"></i> Valider';
+    }
+  });
+}
+
+/* ============================================================
+   PAGE: LISTE UTILISATEURS (admin)
+   ============================================================ */
+async function renderListeUtilisateurs(container) {
+  container.innerHTML = `
+    <h2 class="page-title">Liste des Utilisateurs</h2>
+    <div class="card">
+      <div class="loading"><div class="spinner"></div> Chargement...</div>
+    </div>
+  `;
+
+  try {
+    const res   = await fetch(API);
+    const users = await res.json();
+
+    const rows = users.map(u => `
+      <tr>
+        <td><img src="${u.avatar || ''}" alt="av" onerror="this.style.display='none'"></td>
+        <td>${u.nom} ${u.prenom}</td>
+        <td>${u.pseudo || '—'}</td>
+        <td>${u.email || '—'}</td>
+        <td>${u.Pays || '—'}</td>
+        <td><span class="badge ${u.admin === true || u.admin === 'true' ? 'badge-info' : 'badge-warning'}">${u.admin === true || u.admin === 'true' ? 'Admin' : 'Visiteur'}</span></td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-outline" onclick="navigate('detail-utilisateur',{id:'${u.id}'})"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-sm btn-accent" onclick="navigate('modifier-utilisateur',{id:'${u.id}'})"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>
+    `).join('');
+
+    container.innerHTML = `
+      <h2 class="page-title">Liste des Utilisateurs</h2>
+      <div class="card">
+        <div style="margin-bottom:16px;">
+          <button class="btn btn-accent" onclick="navigate('ajouter-utilisateur')">
+            <i class="fas fa-user-plus"></i> Ajouter
+          </button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Avatar</th><th>Nom</th><th>Pseudo</th><th>Email</th>
+                <th>Pays</th><th>Rôle</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  } catch {
+    container.innerHTML = `
+      <h2 class="page-title">Liste des Utilisateurs</h2>
+      <div class="card"><div class="alert alert-danger">Erreur de chargement.</div></div>
+    `;
+  }
+}
+
+window.deleteUser = async function(id) {
+  if (!confirm('Supprimer cet utilisateur ?')) return;
+  try {
+    await fetch(`${API}/${id}`, { method: 'DELETE' });
+    toast('Utilisateur supprimé.', 'success');
+    navigate('liste-utilisateurs');
+  } catch {
+    toast('Erreur lors de la suppression.', 'error');
+  }
+};
+
+/* ============================================================
+   PAGE: DETAIL UTILISATEUR
+   ============================================================ */
+async function renderDetailUtilisateur(container, id) {
+  container.innerHTML = `<div class="loading"><div class="spinner"></div> Chargement...</div>`;
+  try {
+    const res = await fetch(`${API}/${id}`);
+    const u   = await res.json();
+    const isAdmin = u.admin === true || u.admin === 'true';
+    const fields = [
+      { label: 'Pseudo',  value: u.pseudo  },
+      { label: 'Email',   value: u.email   },
+      { label: 'Pays',    value: u.Pays    },
+      { label: 'Devise',  value: u.Devise  },
+      { label: 'Couleur', value: u.couleur },
+      { label: 'Âge',     value: u.age     },
+      { label: 'Rôle',    value: isAdmin ? 'Administrateur' : 'Visiteur' },
+    ];
+    container.innerHTML = `
+      <h2 class="page-title">Détail Utilisateur</h2>
+      <div style="margin-bottom:12px;">
+        <button class="btn btn-outline" onclick="navigate('liste-utilisateurs')">
+          <i class="fas fa-arrow-left"></i> Retour
+        </button>
+      </div>
+      <div class="card">
+        <div class="profile-header">
+          <img src="${u.avatar||''}" class="profile-photo" alt="av" onerror="this.style.display='none'">
+          <div class="profile-info">
+            <h2>${u.prenom} ${u.nom}</h2>
+            <p>${isAdmin ? '👑 Admin' : '👤 Visiteur'}</p>
+          </div>
+        </div>
+        <div class="profile-grid">
+          ${fields.map(f => `
+            <div class="profile-field">
+              <div class="field-label">${f.label}</div>
+              <div class="field-value">${f.value || '—'}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  } catch {
+    container.innerHTML = `<div class="alert alert-danger">Erreur de chargement.</div>`;
+  }
+}
+
+/* ============================================================
+   PAGE: MODIFIER UTILISATEUR
+   ============================================================ */
+async function renderModifierUtilisateur(container, id) {
+  container.innerHTML = `<div class="loading"><div class="spinner"></div> Chargement...</div>`;
+  try {
+    const res = await fetch(`${API}/${id}`);
+    const u   = await res.json();
+    const colorOpts = COLORS.map(c =>
+      `<option value="${c.value}" ${u.couleur === c.value ? 'selected' : ''}>${c.label}</option>`
+    ).join('');
+
+    container.innerHTML = `
+      <h2 class="page-title">Modifier Utilisateur</h2>
+      <div style="margin-bottom:12px;">
+        <button class="btn btn-outline" onclick="navigate('liste-utilisateurs')">
+          <i class="fas fa-arrow-left"></i> Retour
+        </button>
+      </div>
+      <div class="card">
+        <div class="form-grid">
+          <div class="form-group"><label>Nom</label><input id="eu-nom" value="${u.nom||''}"></div>
+          <div class="form-group"><label>Prénom</label><input id="eu-prenom" value="${u.prenom||''}"></div>
+          <div class="form-group"><label>Âge</label><input type="number" id="eu-age" value="${u.age||''}"></div>
+          <div class="form-group"><label>Pseudo</label><input id="eu-pseudo" value="${u.pseudo||''}"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="eu-email" value="${u.email||''}"></div>
+          <div class="form-group"><label>Pays</label><input id="eu-pays" value="${u.Pays||''}"></div>
+          <div class="form-group"><label>Devise</label><input id="eu-devise" value="${u.Devise||''}"></div>
+          <div class="form-group"><label>Couleur</label><select id="eu-couleur">${colorOpts}</select></div>
+          <div class="form-group"><label>Admin</label>
+            <select id="eu-admin">
+              <option value="false" ${!u.admin || u.admin==='false' ? 'selected':''}>Non</option>
+              <option value="true"  ${u.admin===true||u.admin==='true'  ? 'selected':''}>Oui</option>
+            </select>
+          </div>
+          <div class="form-group full"><label>Avatar URL</label><input id="eu-avatar" value="${u.avatar||''}"></div>
+          <div class="form-group full"><label>Photo URL</label><input id="eu-photo" value="${u.photo||''}"></div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:10px;">
+          <button class="btn btn-accent" id="btn-update-user"><i class="fas fa-save"></i> Sauvegarder</button>
+          <button class="btn btn-outline" onclick="navigate('liste-utilisateurs')">Annuler</button>
+        </div>
+        <ul id="edit-errors" class="error-list"></ul>
+      </div>
+    `;
+
+    $('btn-update-user').addEventListener('click', async () => {
+      const updated = {
+        ...u,
+        nom:        $('eu-nom').value.trim(),
+        prenom:     $('eu-prenom').value.trim(),
+        age:        $('eu-age').value.trim(),
+        pseudo:     $('eu-pseudo').value.trim(),
+        email:      $('eu-email').value.trim(),
+        Pays:       $('eu-pays').value.trim(),
+        Devise:     $('eu-devise').value.trim(),
+        couleur:    $('eu-couleur').value,
+        admin:      $('eu-admin').value === 'true',
+        avatar:     $('eu-avatar').value.trim(),
+        photo:      $('eu-photo').value.trim(),
+      };
+
+      $('btn-update-user').disabled = true;
+      try {
+        await fetch(`${API}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updated),
+        });
+        toast('Utilisateur mis à jour !', 'success');
+        navigate('liste-utilisateurs');
+      } catch {
+        toast('Erreur lors de la mise à jour.', 'error');
+        $('btn-update-user').disabled = false;
+      }
+    });
+  } catch {
+    container.innerHTML = `<div class="alert alert-danger">Erreur de chargement.</div>`;
+  }
+}
+
+/* ============================================================
+   PAGE: AJOUTER UTILISATEUR (admin)
+   ============================================================ */
+function renderAjouterUtilisateur(container) {
+  const colorOpts = COLORS.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
+  container.innerHTML = `
+    <h2 class="page-title">Ajouter un Utilisateur</h2>
+    <div class="card">
+      <div class="form-grid">
+        <div class="form-group"><label>Nom</label><input id="au-nom" placeholder="Nom"></div>
+        <div class="form-group"><label>Prénom</label><input id="au-prenom" placeholder="Prénom"></div>
+        <div class="form-group"><label>Âge</label><input type="number" id="au-age" placeholder="Âge"></div>
+        <div class="form-group"><label>Pseudo</label><input id="au-pseudo" placeholder="Pseudo"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="au-email" placeholder="Email"></div>
+        <div class="form-group"><label>Mot de passe</label><input type="password" id="au-mdp" placeholder="Mot de passe"></div>
+        <div class="form-group"><label>Pays</label><input id="au-pays" placeholder="Pays"></div>
+        <div class="form-group"><label>Devise</label><input id="au-devise" placeholder="Devise"></div>
+        <div class="form-group"><label>Couleur</label><select id="au-couleur">${colorOpts}</select></div>
+        <div class="form-group"><label>Admin</label>
+          <select id="au-admin">
+            <option value="false">Non</option>
+            <option value="true">Oui</option>
+          </select>
+        </div>
+        <div class="form-group full"><label>Avatar URL</label><input id="au-avatar" placeholder="https://..."></div>
+        <div class="form-group full"><label>Photo URL</label><input id="au-photo" placeholder="https://..."></div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;">
+        <button class="btn btn-accent" id="btn-add-user"><i class="fas fa-user-plus"></i> Ajouter</button>
+        <button class="btn btn-outline" onclick="navigate('liste-utilisateurs')">Annuler</button>
+      </div>
+      <ul id="add-errors" class="error-list"></ul>
+    </div>
+  `;
+
+  $('btn-add-user').addEventListener('click', async () => {
+    const vals = {
+      nom:        $('au-nom').value.trim(),
+      prenom:     $('au-prenom').value.trim(),
+      age:        $('au-age').value.trim(),
+      pseudo:     $('au-pseudo').value.trim(),
+      email:      $('au-email').value.trim(),
+      MotDePasse: $('au-mdp').value.trim(),
+      Pays:       $('au-pays').value.trim(),
+      Devise:     $('au-devise').value.trim(),
+      couleur:    $('au-couleur').value,
+      admin:      $('au-admin').value === 'true',
+      avatar:     $('au-avatar').value.trim(),
+      photo:      $('au-photo').value.trim(),
+    };
+
+    const errors = [];
+    Object.entries(vals).forEach(([k, v]) => {
+      if (v === '' || v === null || v === undefined) errors.push(`"${k}" est obligatoire.`);
+    });
+
+    if (errors.length) { renderErrors($('add-errors'), errors); return; }
+
+    $('btn-add-user').disabled = true;
+    try {
+      await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(vals),
+      });
+      toast('Utilisateur ajouté !', 'success');
+      navigate('liste-utilisateurs');
+    } catch {
+      toast('Erreur lors de l\'ajout.', 'error');
+      $('btn-add-user').disabled = false;
+    }
+  });
+}
+
+/* ============================================================
+   PAGE: DEMANDES
+   ============================================================ */
+let demandesLocal = JSON.parse(localStorage.getItem('demandes') || '[]');
+
+function saveDemandesLocal() {
+  localStorage.setItem('demandes', JSON.stringify(demandesLocal));
+}
+
+function renderDemandes(container) {
+  const u = getUser();
+  const isAdmin = u.admin === true || u.admin === 'true';
+
+  if (isAdmin) {
+    renderDemandesAdmin(container);
+  } else {
+    renderDemandesVisiteur(container, u);
+  }
+}
+
+function renderDemandesVisiteur(container, u) {
+  const myDemandes = demandesLocal.filter(d => d.userId === u.id);
+  const currentTab = container.dataset.tab || 'all';
+
+  const filtered = currentTab === 'all' ? myDemandes
+    : myDemandes.filter(d => d.statut === currentTab);
+
+  container.innerHTML = `
+    <h2 class="page-title">Mes Demandes</h2>
+    <div class="card" style="margin-bottom:16px;">
+      <h3 style="margin-bottom:14px;">Nouvelle demande</h3>
+      <div class="inline-form">
+        <input id="d-titre" placeholder="Titre de la demande" />
+        <textarea id="d-desc" placeholder="Description..." rows="3"></textarea>
+        <button class="btn btn-accent" id="btn-add-demande"><i class="fas fa-plus"></i> Soumettre</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="demande-tabs">
+        <button class="tab-btn ${currentTab==='all'?'active':''}" data-tab="all">Toutes</button>
+        <button class="tab-btn ${currentTab==='en attente'?'active':''}" data-tab="en attente">En attente</button>
+        <button class="tab-btn ${currentTab==='approuvée'?'active':''}" data-tab="approuvée">Approuvées</button>
+        <button class="tab-btn ${currentTab==='rejetée'?'active':''}" data-tab="rejetée">Rejetées</button>
+      </div>
+      <div id="demandes-list">
+        ${filtered.length === 0 ? '<p style="color:var(--text-muted)">Aucune demande.</p>' : ''}
+        ${filtered.map(d => `
+          <div class="demande-card" style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;">
+              <div>
+                <strong>${d.titre}</strong>
+                <p style="color:var(--text-muted);font-size:0.88rem;margin-top:4px;">${d.description}</p>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+                <span class="badge ${d.statut==='en attente'?'badge-warning':d.statut==='approuvée'?'badge-success':'badge-danger'}">${d.statut}</span>
+                ${d.statut === 'en attente' ? `<button class="btn btn-sm btn-danger" onclick="annulerDemande('${d.id}')"><i class="fas fa-times"></i> Annuler</button>` : ''}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  container.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.dataset.tab = btn.dataset.tab;
+      renderDemandesVisiteur(container, u);
+    });
+  });
+
+  $('btn-add-demande').addEventListener('click', () => {
+    const titre = $('d-titre').value.trim();
+    const desc  = $('d-desc').value.trim();
+    if (!titre || !desc) { toast('Titre et description obligatoires.', 'warning'); return; }
+    const nd = { id: Date.now().toString(), userId: u.id, userNom: `${u.prenom} ${u.nom}`, titre, description: desc, statut: 'en attente' };
+    demandesLocal.push(nd);
+    saveDemandesLocal();
+    toast('Demande soumise !', 'success');
+    renderDemandesVisiteur(container, u);
+  });
+}
+
+window.annulerDemande = function(id) {
+  const idx = demandesLocal.findIndex(d => d.id === id);
+  if (idx > -1 && demandesLocal[idx].statut === 'en attente') {
+    demandesLocal.splice(idx, 1);
+    saveDemandesLocal();
+    toast('Demande annulée.', 'success');
+    navigate('demandes');
+  }
+};
+
+function renderDemandesAdmin(container) {
+  const currentTab = container.dataset.tab || 'all';
+  const filtered = currentTab === 'all' ? demandesLocal
+    : demandesLocal.filter(d => d.statut === currentTab);
+
+  container.innerHTML = `
+    <h2 class="page-title">Gestion des Demandes</h2>
+    <div class="card">
+      <div class="demande-tabs">
+        <button class="tab-btn ${currentTab==='all'?'active':''}" data-tab="all">Toutes (${demandesLocal.length})</button>
+        <button class="tab-btn ${currentTab==='en attente'?'active':''}" data-tab="en attente">En attente (${demandesLocal.filter(d=>d.statut==='en attente').length})</button>
+        <button class="tab-btn ${currentTab==='approuvée'?'active':''}" data-tab="approuvée">Approuvées (${demandesLocal.filter(d=>d.statut==='approuvée').length})</button>
+        <button class="tab-btn ${currentTab==='rejetée'?'active':''}" data-tab="rejetée">Rejetées (${demandesLocal.filter(d=>d.statut==='rejetée').length})</button>
+      </div>
+      ${filtered.length === 0 ? '<p style="color:var(--text-muted)">Aucune demande.</p>' : ''}
+      ${filtered.map(d => `
+        <div style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;flex-wrap:wrap;">
+            <div>
+              <strong>${d.titre}</strong>
+              <p style="font-size:0.82rem;color:var(--text-muted);margin:2px 0;">${d.userNom || '—'}</p>
+              <p style="color:var(--text-muted);font-size:0.88rem;margin-top:4px;">${d.description}</p>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+              <span class="badge ${d.statut==='en attente'?'badge-warning':d.statut==='approuvée'?'badge-success':'badge-danger'}">${d.statut}</span>
+              <div style="display:flex;gap:6px;">
+                <button class="btn btn-sm btn-success" onclick="changerStatut('${d.id}','approuvée')"><i class="fas fa-check"></i></button>
+                <button class="btn btn-sm btn-danger"  onclick="changerStatut('${d.id}','rejetée')"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  container.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.dataset.tab = btn.dataset.tab;
+      renderDemandesAdmin(container);
+    });
+  });
+}
+
+window.changerStatut = function(id, statut) {
+  const d = demandesLocal.find(x => x.id === id);
+  if (d) {
+    d.statut = statut;
+    saveDemandesLocal();
+    toast(`Demande ${statut}.`, 'success');
+    navigate('demandes');
+  }
+};
+
+/* ============================================================
+   RIPPLE EFFECT
+   ============================================================ */
+function initRipple() {
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.btn, .btn-primary, .btn-logout, .tab-btn');
+    if (!btn) return;
+    const circle = document.createElement('span');
+    circle.className = 'btn-ripple';
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    circle.style.width = circle.style.height = size + 'px';
+    circle.style.left = (e.clientX - rect.left - size / 2) + 'px';
+    circle.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
+    btn.appendChild(circle);
+    circle.addEventListener('animationend', () => circle.remove());
+  });
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+function boot() {
+  const user = getUser();
+  if (user) {
+    currentUser = user;
+    initLayout();
+    showPage('page-layout');
+  } else {
+    showPage('page-login');
+  }
+  initLogin();
+  initCreate();
+  initRipple();
+}
+
+window.navigate = navigate;
+document.addEventListener('DOMContentLoaded', boot);
+
+</script>
+</body>
+</html>
